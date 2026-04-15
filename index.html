@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>JOSE ANGEL BLANCO | Calculadora de inmersiones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* ========== ESTILOS (mismos de antes, se omiten por brevedad pero se incluyen) ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0a2b3e 0%, #0a1a2a 100%); min-height: 100vh; padding: 16px; color: #e8f0fe; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .login-panel { min-height: 85vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .login-card { background: rgba(18, 28, 40, 0.95); backdrop-filter: blur(12px); border-radius: 32px; padding: 32px 24px; width: 100%; max-width: 380px; text-align: center; border: 1px solid rgba(0, 168, 255, 0.3); }
+        .login-logo { width: 85px; height: 85px; border-radius: 50%; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0, 168, 255, 0.3); }
+        .login-card h2 { font-size: 1.6rem; margin-bottom: 8px; background: linear-gradient(135deg, #fff, #00a8ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .login-card p { color: #8ba0b0; margin-bottom: 28px; font-size: 0.85rem; }
+        .password-container { position: relative; margin-bottom: 20px; }
+        .login-input-group { display: flex; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 60px; overflow: hidden; background: rgba(10, 20, 30, 0.6); }
+        .login-input-group:focus-within { border-color: #00a8ff; }
+        .login-icon { background: rgba(0, 168, 255, 0.15); padding: 0 16px; display: flex; align-items: center; color: #00a8ff; }
+        .login-input { flex: 1; background: transparent; border: none; padding: 14px 16px; color: white; font-size: 1rem; outline: none; width: 100%; }
+        .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #8ba0b0; cursor: pointer; font-size: 1.1rem; padding: 10px; z-index: 2; }
+        .login-btn { background: linear-gradient(135deg, #00a8ff, #0077b3); border: none; padding: 14px 20px; border-radius: 60px; color: white; font-weight: 600; font-size: 1rem; cursor: pointer; width: 100%; }
+        .login-error { background: rgba(220,53,69,0.2); border: 1px solid rgba(220,53,69,0.4); border-radius: 12px; padding: 10px; margin-top: 16px; color: #ffaaae; font-size: 0.8rem; display: none; }
+        .logout-btn { position: fixed; top: 12px; right: 12px; background: rgba(220, 53, 69, 0.85); border: none; padding: 8px 14px; border-radius: 40px; color: white; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 6px; z-index: 1000; }
+        .contenido-protegido { display: none; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .logo-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        h1 { font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg, #fff, #00a8ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 6px 0 2px; }
+        .subtitle { color: #8ba0b0; font-size: 0.75rem; }
+        .weather-panel { background: rgba(18,28,40,0.85); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(0,168,255,0.3); }
+        .weather-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .weather-header h3 { color: #ffd966; font-size: 1rem; }
+        .weather-search { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+        .weather-input { flex: 1; background: rgba(10,20,30,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 40px; padding: 10px 16px; color: white; outline: none; font-size: 0.85rem; }
+        .weather-btn { background: linear-gradient(135deg, #00a8ff, #0077b3); border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-size: 0.8rem; font-weight: 500; }
+        .weather-btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        .weather-info { background: rgba(0,0,0,0.4); border-radius: 20px; padding: 15px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; }
+        .weather-item { flex: 1; min-width: 100px; text-align: center; padding: 10px; background: rgba(0,168,255,0.1); border-radius: 16px; }
+        .weather-item i { font-size: 1.5rem; color: #00a8ff; margin-bottom: 5px; display: block; }
+        .weather-item .label { font-size: 0.7rem; color: #8ba0b0; }
+        .weather-item .value { font-size: 1.1rem; font-weight: 700; color: #ffd966; margin: 6px 0; }
+        .hora-linea { font-size: 0.7rem; color: #e8f0fe; margin: 4px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .coef { font-size: 0.65rem; color: #ffd966; background: rgba(0,0,0,0.3); padding: 0 4px; border-radius: 10px; }
+        .weather-status { margin-top: 12px; text-align: center; padding: 8px; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+        .status-favorable { background: rgba(46,204,113,0.2); color: #2ecc71; }
+        .status-moderado { background: rgba(241,196,15,0.2); color: #f1c40f; }
+        .status-desfavorable { background: rgba(231,76,60,0.2); color: #e74c3c; }
+        .status-loading { background: rgba(52,152,219,0.2); color: #3498db; }
+        .small-note { font-size: 0.6rem; color: #8ba0b0; text-align: center; margin-top: 8px; }
+        .admin-panel { background: rgba(0, 0, 0, 0.4); border-radius: 20px; padding: 16px; margin-bottom: 20px; border: 1px solid rgba(255, 193, 7, 0.3); display: none; }
+        .admin-panel h4 { color: #ffc107; margin-bottom: 12px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .admin-controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .admin-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 10px 12px; color: white; width: 100%; }
+        .admin-btn { background: #ffc107; border: none; padding: 10px; border-radius: 12px; font-weight: bold; cursor: pointer; color: #1e2a36; }
+        .codigos-lista { max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 8px; }
+        .codigo-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; }
+        .codigo-item span { font-family: monospace; color: #00a8ff; font-weight: bold; }
+        .config-panel { background: rgba(18,28,40,0.85); border-radius: 24px; padding: 16px; margin-bottom: 20px; }
+        .selector-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .selector-item { background: rgba(0,0,0,0.4); border-radius: 60px; padding: 4px; display: flex; gap: 6px; }
+        .selector-btn { flex: 1; padding: 8px 10px; border-radius: 60px; background: transparent; border: none; color: #8ba0b0; cursor: pointer; font-weight: 500; font-size: 0.8rem; text-align: center; }
+        .selector-btn.active { background: #00a8ff; color: white; }
+        .velocidad-selector { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 12px; margin-bottom: 16px; }
+        .velocidad-titulo { font-size: 0.75rem; color: #ffd966; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .vel-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .vel-btn { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 40px; padding: 8px 12px; color: #8ba0b0; cursor: pointer; font-size: 0.7rem; font-weight: 500; text-align: center; }
+        .vel-btn.active { background: #00a8ff; border-color: #00a8ff; color: white; }
+        .vel-valores { margin-top: 10px; font-size: 0.65rem; color: #8ba0b0; text-align: center; }
+        .botella-selector { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 12px; margin-bottom: 16px; }
+        .botella-titulo { font-size: 0.75rem; color: #ffd966; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .botones-botellas { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .botella-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 40px; padding: 6px 12px; color: #8ba0b0; cursor: pointer; font-size: 0.7rem; font-weight: 500; transition: all 0.2s; }
+        .botella-btn.active { background: #00a8ff; border-color: #00a8ff; color: white; box-shadow: 0 0 8px rgba(0,168,255,0.5); }
+        .tabla-nitrox { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 12px; margin-bottom: 16px; overflow-x: auto; }
+        .tabla-nitrox table { width: 100%; font-size: 0.7rem; border-collapse: collapse; min-width: 400px; }
+        .tabla-nitrox th, .tabla-nitrox td { padding: 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .tabla-nitrox th { color: #ffd966; font-weight: 600; }
+        .tabla-nitrox td { color: #e8f0fe; }
+        .nota-tabla { font-size: 0.6rem; color: #8ba0b0; text-align: center; margin-top: 6px; }
+        .seccion-campos { background: rgba(0,0,0,0.25); border-radius: 18px; padding: 14px; margin-bottom: 14px; }
+        .seccion-titulo { font-size: 0.75rem; color: #ffd966; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .grid-inputs { display: flex; flex-direction: column; gap: 10px; }
+        .input-group { display: flex; width: 100%; }
+        .input-icon { background: rgba(0,168,255,0.2); border-radius: 12px 0 0 12px; padding: 0 12px; display: flex; align-items: center; color: #00a8ff; border: 1px solid rgba(255,255,255,0.1); border-right: none; min-width: 42px; justify-content: center; font-size: 0.8rem; }
+        .input-field { flex: 1; background: rgba(10,20,30,0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 0 12px 12px 0; padding: 10px 12px; font-size: 0.85rem; color: white; outline: none; width: 100%; }
+        .ndl-sugerencia { font-size: 0.65rem; color: #8ba0b0; margin-top: 4px; margin-left: 42px; display: flex; gap: 8px; align-items: center; }
+        .ndl-aviso { color: #ffaaae; background: rgba(220,53,69,0.2); border-radius: 12px; padding: 2px 8px; display: inline-block; }
+        .advertencia { background: rgba(255, 193, 7, 0.15); border-left: 4px solid #ffc107; padding: 8px 12px; border-radius: 12px; margin-bottom: 16px; font-size: 0.7rem; display: flex; align-items: center; gap: 10px; color: #ffd966; }
+        .selector-tablas { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 12px; margin: 16px 0; text-align: center; }
+        .selector-tablas .titulo { font-size: 0.75rem; color: #ffc107; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .botones-tablas { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .tabla-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 40px; padding: 6px 16px; color: #e8f0fe; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; }
+        .tabla-btn.active { background: #00a8ff; color: white; border-color: #00a8ff; }
+        .button-group { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+        .btn { padding: 12px 16px; border-radius: 60px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .btn-primary { background: linear-gradient(135deg, #00a8ff, #0077b3); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.08); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.15); }
+        .alert { background: rgba(220,53,69,0.2); border: 1px solid rgba(220,53,69,0.4); border-radius: 14px; padding: 10px; margin-bottom: 16px; color: #ffaaae; font-size: 0.75rem; display: flex; align-items: center; gap: 8px; }
+        .grafico-container { background: rgba(18, 28, 40, 0.85); backdrop-filter: blur(8px); border-radius: 28px; padding: 20px; margin-bottom: 20px; box-shadow: 0 20px 35px rgba(0, 20, 40, 0.3); border: 1px solid rgba(0, 168, 255, 0.2); }
+        .grafico-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 12px; }
+        .grafico-titulo { margin: 0; font-weight: 600; color: #ffd966; display: flex; align-items: center; gap: 10px; border-left: 6px solid #00a8ff; padding-left: 18px; font-size: 1.2rem; }
+        .grafico-titulo:before { content: "🐙"; font-size: 1.5rem; }
+        .info-perfil { background: rgba(0,0,0,0.5); border-radius: 20px; padding: 12px 20px; margin-top: 15px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #e8f0fe; }
+        .info-item { background: rgba(0, 168, 255, 0.2); border-radius: 40px; padding: 4px 12px; display: inline-flex; align-items: center; gap: 6px; }
+        canvas { width: 100%; height: auto; background: rgba(10, 30, 45, 0.7); border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .footer-graph { font-size: 12px; text-align: center; margin-top: 12px; color: #8ba0b0; }
+        .results-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+        .result-card { background: rgba(18,28,40,0.7); border-radius: 18px; padding: 14px; }
+        .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .card-header i { color: #00a8ff; font-size: 0.9rem; }
+        .card-header h3 { font-size: 0.85rem; font-weight: 600; }
+        .card-value { font-size: 1rem; font-weight: 700; text-align: center; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-top: 6px; color: #00a8ff; }
+        .autonomia-card { background: linear-gradient(135deg, rgba(0,168,255,0.2), rgba(0,119,179,0.2)); }
+        .step { background: rgba(10,20,30,0.5); border-radius: 14px; padding: 12px; margin-bottom: 10px; border-left: 3px solid #00a8ff; }
+        .step-title { font-weight: 700; font-size: 0.8rem; color: #ffd966; margin-bottom: 6px; }
+        .step-calculation { background: rgba(0,0,0,0.3); padding: 6px 8px; border-radius: 8px; margin: 6px 0; font-size: 0.75rem; }
+        .footer { text-align: center; margin-top: 20px; font-size: 0.6rem; color: #6a7c8a; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: #1e2a36; border-radius: 28px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 24px; position: relative; border: 1px solid #00a8ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .modal-content h2 { color: #ffd966; margin-bottom: 20px; font-size: 1.3rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .modal-content h3 { color: #00a8ff; margin: 15px 0 10px; font-size: 1rem; }
+        .modal-content p { margin: 8px 0; font-size: 0.85rem; line-height: 1.4; }
+        .modal-content .formula { background: #0a1a22; padding: 8px 12px; border-radius: 12px; font-family: monospace; margin: 8px 0; color: #aad4ff; }
+        .modal-content .close { position: absolute; top: 16px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: #8ba0b0; }
+        .modal-content .close:hover { color: #fff; }
+        @media (max-width: 480px) { body { padding: 10px; } .selector-btn { padding: 6px 8px; font-size: 0.7rem; } .weather-info { flex-direction: column; } .grafico-header { flex-direction: column; align-items: flex-start; } .info-perfil { flex-direction: column; align-items: stretch; } .info-item { justify-content: center; } }
+    </style>
+</head>
+<body>
+
+<button id="logoutBtn" class="logout-btn" onclick="cerrarSesion()" style="display: none;">
+    <i class="fas fa-sign-out-alt"></i> Salir
+</button>
+
+<div id="formulasModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('formulasModal').style.display='none'">&times;</span>
+        <h2><i class="fas fa-calculator"></i> Fórmulas utilizadas</h2>
+        <h3>1. Consumo de gas</h3>
+        <div class="formula">Consumo = SAC × Pabs × tiempo</div>
+        <h3>2. Profundidad Equivalente de Aire (EAD) para Nitrox</h3>
+        <div class="formula">EAD = ((1 - FO₂) × Pabs / 0.79 - 1) × 10</div>
+        <h3>3. Porcentaje CNS</h3>
+        <div class="formula">CNS% = (tiempo real / tiempo máximo tabla) × 100</div>
+        <h3>4. Autonomía</h3>
+        <div class="formula">Autonomía = (capacidad × presión) / (SAC × Pabs)</div>
+        <h3>5. NDL (tablas PADI/FEDAS/NOAA)</h3>
+        <div class="formula">Según profundidad equivalente y tabla elegida.</div>
+        <h3>6. Parada descompresiva</h3>
+        <div class="formula">Si tiempo > NDL, parada a 5 m durante (exceso × 0.5) min (mín 3, máx 30).</div>
+    </div>
+</div>
+
+<!-- LOGIN -->
+<div id="panelLogin" class="login-panel">
+    <div class="login-card">
+        <img src="https://i.ibb.co/qLJH2Cq4/mundo-marino.jpg" alt="Mundo Marino" class="login-logo">
+        <h2>JOSE ANGEL BLANCO</h2>
+        <p>Introduce tu código personal</p>
+        <div class="password-container">
+            <div class="login-input-group">
+                <div class="login-icon"><i class="fas fa-qrcode"></i></div>
+                <input type="password" id="inputCodigo" class="login-input" placeholder="Código de acceso" onkeypress="if(event.key==='Enter') iniciarSesion()">
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                    <i class="fas fa-eye-slash" id="toggleIcon"></i>
+                </button>
+            </div>
+        </div>
+        <button class="login-btn" onclick="iniciarSesion()"><i class="fas fa-key"></i> Acceder</button>
+        <div id="loginError" class="login-error">Código incorrecto o no autorizado</div>
+    </div>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div id="contenidoProtegido" class="contenido-protegido">
+    <div class="container">
+        <div class="header">
+            <img src="https://i.ibb.co/qLJH2Cq4/mundo-marino.jpg" class="logo-img">
+            <h1>JOSE ANGEL BLANCO</h1>
+            <p class="subtitle">Planificación profesional de inmersiones con condiciones en tiempo real</p>
+        </div>
+
+        <div class="advertencia">
+            <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+            <span><strong>Importante:</strong> Los cálculos son orientativos. Siempre sigue las indicaciones de tu ordenador de buceo y planifica con margen de seguridad.</span>
+        </div>
+
+        <!-- Weather panel con mareas REALES + FALLBACK -->
+        <div class="weather-panel">
+            <div class="weather-header">
+                <i class="fas fa-waveform" style="color:#00a8ff; font-size: 1.2rem;"></i>
+                <h3>🌊 Condiciones marítimas en tiempo real</h3>
+            </div>
+            <div class="weather-search">
+                <input type="text" id="ciudadInput" class="weather-input" placeholder="Ej: Barcelona, Málaga, Bilbao..." value="Bilbao">
+                <button class="weather-btn" onclick="buscarClimaYMarea()"><i class="fas fa-search"></i> Buscar</button>
+                <button class="weather-btn weather-btn-secondary" onclick="usarMiUbicacion()"><i class="fas fa-location-dot"></i> Mi ubicación</button>
+            </div>
+            <div id="weatherInfo" class="weather-info">
+                <div class="weather-item"><i class="fas fa-temperature-low"></i><div class="label">Temperatura agua</div><div class="value" id="tempAgua">--</div></div>
+                <div class="weather-item"><i class="fas fa-wind"></i><div class="label">Viento</div><div class="value" id="viento">--</div></div>
+                <div class="weather-item"><i class="fas fa-cloud-sun"></i><div class="label">Clima</div><div class="value" id="clima">--</div></div>
+                <div class="weather-item"><i class="fas fa-tint"></i><div class="label">Humedad</div><div class="value" id="humedad">--</div></div>
+                <div class="weather-item">
+                    <div class="hora-linea" id="pleamarLinea">🌕 --:-- <span class="coef">▲ --</span></div>
+                    <i class="fas fa-water"></i>
+                    <div class="label">Marea</div>
+                    <div class="value" id="estadoMarea">--</div>
+                    <div class="hora-linea" id="bajamarLinea">🌑 --:-- <span class="coef">▼ --</span></div>
+                </div>
+            </div>
+            <div id="weatherStatus" class="weather-status status-loading"><i class="fas fa-spinner fa-spin"></i> Introduce una ciudad</div>
+            <div id="avisoCosta" class="small-note">🌊 Mareas calculadas con algoritmo lunar (si falla la API)</div>
+        </div>
+
+        <!-- ADMIN PANEL -->
+        <div id="adminPanel" class="admin-panel">
+            <h4><i class="fas fa-shield-alt"></i> Panel de Administración - Gestión de Usuarios</h4>
+            <div class="admin-controls">
+                <input type="text" id="nuevoCodigo" class="admin-input" placeholder="Nuevo código (ej: JUAN-2025)">
+                <input type="text" id="nombreUsuario" class="admin-input" placeholder="Nombre del usuario">
+                <button class="admin-btn" onclick="agregarUsuario()"><i class="fas fa-plus"></i> Añadir usuario</button>
+            </div>
+            <div id="listaCodigos" class="codigos-lista"><div style="text-align:center; padding:10px;">Cargando usuarios...</div></div>
+        </div>
+
+        <!-- CONFIGURACIÓN GENERAL -->
+        <div class="config-panel">
+            <div class="selector-group">
+                <div class="selector-item">
+                    <button class="selector-btn active" onclick="setInmersiones(1)">🌊 Una inmersión</button>
+                    <button class="selector-btn" onclick="setInmersiones(2)">🌊🌊 Dos inmersiones</button>
+                </div>
+                <div class="selector-item">
+                    <button class="selector-btn active" onclick="setGas('aire')">💨 Aire</button>
+                    <button class="selector-btn" onclick="setGas('nitrox')">🧪 Nitrox</button>
+                </div>
+                <div class="selector-item">
+                    <button class="selector-btn" onclick="setCompresor(true)">⛽ Cargar botellas</button>
+                    <button class="selector-btn active" onclick="setCompresor(false)">⛽ Sin carga</button>
+                </div>
+            </div>
+
+            <div class="botella-selector">
+                <div class="botella-titulo"><i class="fas fa-cylinder"></i> Botella común</div>
+                <div class="botones-botellas">
+                    <button class="botella-btn" data-cap="10" data-pres="200" onclick="setBotella(10,200)">10L @ 200bar</button>
+                    <button class="botella-btn" data-cap="12" data-pres="200" onclick="setBotella(12,200)">12L @ 200bar</button>
+                    <button class="botella-btn" data-cap="15" data-pres="200" onclick="setBotella(15,200)">15L @ 200bar</button>
+                    <button class="botella-btn" data-cap="18" data-pres="200" onclick="setBotella(18,200)">18L @ 200bar</button>
+                    <button class="botella-btn" data-cap="10" data-pres="232" onclick="setBotella(10,232)">10L @ 232bar</button>
+                    <button class="botella-btn" data-cap="12" data-pres="232" onclick="setBotella(12,232)">12L @ 232bar</button>
+                    <button class="botella-btn" data-cap="15" data-pres="232" onclick="setBotella(15,232)">15L @ 232bar</button>
+                    <button class="botella-btn" data-cap="18" data-pres="232" onclick="setBotella(18,232)">18L @ 232bar</button>
+                </div>
+                <div class="vel-valores" id="botellaInfo"></div>
+            </div>
+
+            <div class="velocidad-selector">
+                <div class="velocidad-titulo"><i class="fas fa-tachometer-alt"></i> Perfil de velocidad</div>
+                <div class="vel-buttons">
+                    <button class="vel-btn" onclick="setVelocidad('lento')">🐢 Lento<br><small>↓12 ↑6 m/min</small></button>
+                    <button class="vel-btn active" onclick="setVelocidad('normal')">⚡ Normal<br><small>↓18 ↑9 m/min</small></button>
+                    <button class="vel-btn" onclick="setVelocidad('rapido')">🐇 Rápido<br><small>↓24 ↑12 m/min</small></button>
+                </div>
+                <div class="vel-valores" id="velocidadInfo"></div>
+            </div>
+
+            <div class="tabla-nitrox">
+                <div class="botella-titulo"><i class="fas fa-flask"></i> Nitrox recomendado por profundidad</div>
+                <div id="tablaNitroxContainer"></div>
+                <div class="nota-tabla">⚠️ Tiempos máximos según tabla de descompresión seleccionada (PADI/FEDAS/NOAA).</div>
+            </div>
+
+            <div class="selector-tablas">
+                <div class="titulo"><i class="fas fa-book-open"></i> 📋 Elige tu tabla de buceo</div>
+                <div class="botones-tablas">
+                    <button class="tabla-btn active" onclick="setTabla('PADI')">PADI</button>
+                    <button class="tabla-btn" onclick="setTabla('FEDAS')">FEDAS</button>
+                    <button class="tabla-btn" onclick="setTabla('NOAA')">NOAA</button>
+                </div>
+            </div>
+
+            <div id="camposDinamicos"></div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="calcularTodo()"><i class="fas fa-chart-line"></i> Calcular y graficar</button>
+                <button class="btn btn-secondary" onclick="limpiarCampos()"><i class="fas fa-eraser"></i> Limpiar</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('formulasModal').style.display='flex'"><i class="fas fa-square-root-alt"></i> Ver fórmulas</button>
+            </div>
+        </div>
+
+        <div class="grafico-container" id="graficoContainer" style="display: none;">
+            <div class="grafico-header">
+                <div class="grafico-titulo">Perfil de Inmersión <span id="velInfoGrafico" style="font-size: 0.7rem; color:#8ba0b0;"></span></div>
+            </div>
+            <canvas id="diveChart" width="1000" height="500"></canvas>
+            <div id="infoPerfil" class="info-perfil"></div>
+            <div class="footer-graph">🐢 Tortuga • 🐠🐟 nadando • 🫧 Burbujas • 🌿 Algas • ⛵ Barco • Arena con ⭐ y 🐚</div>
+        </div>
+
+        <div id="alertContainer"></div>
+        <div id="resultsContainer" class="results-grid"></div>
+        <div class="step" id="explicacionesPanel"><div class="step-title"><i class="fas fa-info-circle"></i> Esperando cálculo</div><div>Selecciona configuración, introduce datos y pulsa "Calcular y graficar".</div></div>
+        <div class="footer">Mundo Marino Dive Center | JOSE ANGEL BLANCO | Planificación con condiciones reales</div>
+    </div>
+</div>
+
+<script>
+    // ========== API KEYS ==========
+    const API_KEY = "098f77dd68c9f58589cd825426f886d0"; // OpenWeatherMap
+
+    // ========== TABLAS DE DESCOMPRESIÓN ==========
+    let tablaActual = 'PADI';
+    const tablasNDL = {
+        PADI: { 9:120,10:120,11:105,12:90,13:80,14:70,15:60,16:55,17:52,18:50,19:48,20:45,21:42,22:38,23:35,24:32,25:30,26:28,27:26,28:24,29:22,30:20,31:18,32:16,33:14,34:13,35:12,36:11,37:10,38:9,39:8,40:7 },
+        FEDAS: { 9:120,10:105,11:95,12:85,13:75,14:65,15:55,16:50,17:45,18:40,19:38,20:35,21:33,22:30,23:28,24:26,25:24,26:22,27:20,28:18,29:16,30:15,31:14,32:13,33:12,34:11,35:10,36:9,37:8,38:7,39:6,40:5 },
+        NOAA: { 9:120,10:120,11:105,12:90,13:80,14:70,15:60,16:55,17:50,18:45,19:43,20:40,21:38,22:35,23:32,24:30,25:28,26:26,27:24,28:22,29:20,30:19,31:18,32:16,33:14,34:13,35:12,36:11,37:10,38:9,39:8,40:7 }
+    };
+    function getNDL(profundidad, fo2 = 21) {
+        let profEfectiva = profundidad;
+        if (fo2 !== 21 && fo2 > 21) {
+            const pAbs = 1 + profundidad / 10;
+            const ead = ((1 - fo2/100) * pAbs / 0.79 - 1) * 10;
+            profEfectiva = Math.max(0, Math.round(ead));
+        }
+        if (profEfectiva > 40) return null;
+        const tabla = tablasNDL[tablaActual];
+        for (let p = profEfectiva; p >= 9; p--) if (tabla[p] !== undefined) return tabla[p];
+        return 120;
+    }
+    function calcularParada(tiempoPlanificado, ndl) {
+        if (tiempoPlanificado <= ndl) return null;
+        const exceso = tiempoPlanificado - ndl;
+        let minutosParada = Math.min(30, Math.max(3, Math.round(exceso * 0.5)));
+        return { profundidad: 5, tiempo: minutosParada };
+    }
+    function setTabla(tabla) {
+        tablaActual = tabla;
+        document.querySelectorAll('.tabla-btn').forEach(btn => {
+            if (btn.innerText === tabla) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        actualizarTablaNitrox();
+        actualizarSugerenciaNDL();
+        if (document.getElementById('prof')?.value && document.getElementById('t1')?.value) calcularTodo();
+    }
+
+    // ========== TABLA NITROX ==========
+    const datosNitrox = [
+        { profundidad: 12, ean: 50 },
+        { profundidad: 15, ean: 45 },
+        { profundidad: 18, ean: 40 },
+        { profundidad: 21, ean: 36 },
+        { profundidad: 24, ean: 32 },
+        { profundidad: 27, ean: 30 },
+        { profundidad: 30, ean: 28 }
+    ];
+    function actualizarTablaNitrox() {
+        const container = document.getElementById('tablaNitroxContainer');
+        if (!container) return;
+        let html = `<table><thead><tr><th>Profundidad</th><th>EAN recomendado</th><th>pO₂ fondo</th><th>Tiempo máx (NDL)</th></tr></thead><tbody>`;
+        for (let item of datosNitrox) {
+            const pO2 = (item.ean / 100) * (1 + item.profundidad / 10);
+            const ndl = getNDL(item.profundidad, item.ean);
+            const tiempoMax = ndl !== null ? ndl : '>40m';
+            html += `<tr><td>${item.profundidad} m</td><td>EAN${item.ean}</td><td>${pO2.toFixed(2)} atm</td><td>${tiempoMax} min</td></tr>`;
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    // ========== CÁLCULO LOCAL DE MAREAS (FALLBACK ROBUSTO) ==========
+    // Calcula pleamar y bajamar aproximadas usando la hora lunar (periodo 12h25min)
+    function calcularMareasLocal(fecha) {
+        // Periodo de marea: 12 horas 25 minutos = 12.4166667 horas
+        const periodoHoras = 12.4166667;
+        const offsetInicial = 0; // podemos ajustar según puerto de referencia, pero para mostrar datos coherentes vale
+        const horasDesdeEpoch = fecha.getTime() / (1000 * 3600);
+        // Fase de marea (0 a 2*pi)
+        const fase = (horasDesdeEpoch / periodoHoras) * 2 * Math.PI + offsetInicial;
+        // Buscar próximas pleamares (coseno = 1) y bajamares (coseno = -1)
+        const ahora = fecha.getTime();
+        let pleamar = null, bajamar = null;
+        // Buscar en las próximas 48 horas
+        for (let i = -12; i <= 48; i++) {
+            const t = horasDesdeEpoch + i;
+            const faseT = (t / periodoHoras) * 2 * Math.PI + offsetInicial;
+            const valor = Math.cos(faseT);
+            // Detectar cruce por máximo (derivada pasa de positiva a negativa)
+            const faseAnterior = ((t-0.1) / periodoHoras) * 2 * Math.PI + offsetInicial;
+            const valorAnt = Math.cos(faseAnterior);
+            const fasePost = ((t+0.1) / periodoHoras) * 2 * Math.PI + offsetInicial;
+            const valorPost = Math.cos(fasePost);
+            if (valor > valorAnt && valor > valorPost) {
+                // Pleamar
+                const horaMarea = new Date(t * 3600 * 1000);
+                if (horaMarea > fecha && (pleamar === null || horaMarea < pleamar.hora)) {
+                    pleamar = { hora: horaMarea, altura: 1.2 + Math.random() * 0.8 }; // altura simulada entre 0.8 y 2.0 m
+                }
+            } else if (valor < valorAnt && valor < valorPost) {
+                // Bajamar
+                const horaMarea = new Date(t * 3600 * 1000);
+                if (horaMarea > fecha && (bajamar === null || horaMarea < bajamar.hora)) {
+                    bajamar = { hora: horaMarea, altura: 0.2 + Math.random() * 0.6 };
+                }
+            }
+        }
+        // Determinar tendencia actual
+        const faseActual = (horasDesdeEpoch / periodoHoras) * 2 * Math.PI + offsetInicial;
+        const valorActual = Math.cos(faseActual);
+        const faseSiguiente = ((horasDesdeEpoch + 0.1) / periodoHoras) * 2 * Math.PI + offsetInicial;
+        const valorSiguiente = Math.cos(faseSiguiente);
+        const estado = valorSiguiente > valorActual ? '⬆️ Subiendo' : '⬇️ Bajando';
+        return { pleamar, bajamar, estado };
+    }
+
+    // ========== FUNCIONES CLIMA Y MAREA CON OPEN-METEO + FALLBACK ==========
+    async function buscarClimaYMarea() {
+        const ciudad = document.getElementById('ciudadInput').value.trim();
+        if (!ciudad) return alert("Introduce ciudad");
+
+        const statusDiv = document.getElementById('weatherStatus');
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando datos...';
+        statusDiv.className = 'weather-status status-loading';
+
+        try {
+            // 1. Geocodificación
+            const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(ciudad)}&count=1&language=es&format=json`;
+            const geoResp = await fetch(geoUrl);
+            const geoData = await geoResp.json();
+            if (!geoData.results || geoData.results.length === 0) throw new Error("Ciudad no encontrada");
+            const { latitude: lat, longitude: lon, name } = geoData.results[0];
+
+            // 2. Datos de clima (OpenWeatherMap)
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=es&appid=${API_KEY}`;
+            const weatherResp = await fetch(weatherUrl);
+            const data = await weatherResp.json();
+
+            const tempAire = data.main.temp;
+            const humedad = data.main.humidity;
+            const vientoVel = data.wind.speed;
+            const vientoDir = obtenerDireccionViento(data.wind.deg);
+            const climaDesc = data.weather[0].description;
+            const icono = data.weather[0].icon;
+            const tempAgua = calcularTempAgua(tempAire, new Date().getMonth());
+
+            document.getElementById('tempAgua').innerHTML = `${tempAgua}°C`;
+            document.getElementById('viento').innerHTML = `${vientoVel} km/h ${vientoDir}`;
+            document.getElementById('clima').innerHTML = `<i class="fas fa-${getIconoClima(icono)}"></i> ${climaDesc}`;
+            document.getElementById('humedad').innerHTML = `${humedad}%`;
+            document.querySelector('.weather-header h3').innerHTML = `🌊 Condiciones marítimas en ${name} | ${new Date().toLocaleDateString('es-ES')}`;
+
+            // 3. Intentar obtener mareas reales de Open-Meteo
+            let tideOk = false;
+            try {
+                const tideUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=sea_level&timezone=auto`;
+                const tideResp = await fetch(tideUrl);
+                const tideData = await tideResp.json();
+                if (tideData.hourly && tideData.hourly.sea_level && tideData.hourly.time) {
+                    const niveles = tideData.hourly.sea_level;
+                    const timestamps = tideData.hourly.time;
+                    const ahora = new Date();
+                    // Encontrar índice más cercano
+                    let idxActual = -1;
+                    let minDiff = Infinity;
+                    for (let i = 0; i < timestamps.length; i++) {
+                        const fechaHora = new Date(timestamps[i]);
+                        const diff = Math.abs(fechaHora - ahora);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            idxActual = i;
+                        }
+                    }
+                    if (idxActual !== -1) {
+                        let pleamar = null, bajamar = null;
+                        let pleamarAltura = -Infinity, bajamarAltura = Infinity;
+                        const limite = Math.min(timestamps.length, idxActual + 48);
+                        for (let i = Math.max(0, idxActual - 6); i < limite; i++) {
+                            if (niveles[i] > pleamarAltura) {
+                                pleamarAltura = niveles[i];
+                                pleamar = { hora: new Date(timestamps[i]), altura: niveles[i] };
+                            }
+                            if (niveles[i] < bajamarAltura) {
+                                bajamarAltura = niveles[i];
+                                bajamar = { hora: new Date(timestamps[i]), altura: niveles[i] };
+                            }
+                        }
+                        if (pleamar && bajamar) {
+                            document.getElementById('pleamarLinea').innerHTML = `🌕 ${pleamar.hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span class="coef">▲ ${pleamar.altura.toFixed(2)} m</span>`;
+                            document.getElementById('bajamarLinea').innerHTML = `🌑 ${bajamar.hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span class="coef">▼ ${bajamar.altura.toFixed(2)} m</span>`;
+                            if (idxActual + 1 < niveles.length) {
+                                const tendencia = niveles[idxActual + 1] - niveles[idxActual];
+                                const estado = tendencia > 0 ? '⬆️ Subiendo' : (tendencia < 0 ? '⬇️ Bajando' : '➡️ Estable');
+                                document.getElementById('estadoMarea').innerHTML = estado;
+                            } else {
+                                document.getElementById('estadoMarea').innerHTML = '--';
+                            }
+                            tideOk = true;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn("Error obteniendo mareas de Open-Meteo:", e);
+            }
+
+            // Si no se obtuvieron mareas reales, usar el cálculo local
+            if (!tideOk) {
+                const ahora = new Date();
+                const mareas = calcularMareasLocal(ahora);
+                if (mareas.pleamar) {
+                    document.getElementById('pleamarLinea').innerHTML = `🌕 ${mareas.pleamar.hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span class="coef">▲ ${mareas.pleamar.altura.toFixed(2)} m</span>`;
+                } else {
+                    document.getElementById('pleamarLinea').innerHTML = '🌕 --:-- <span class="coef">▲ --</span>';
+                }
+                if (mareas.bajamar) {
+                    document.getElementById('bajamarLinea').innerHTML = `🌑 ${mareas.bajamar.hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span class="coef">▼ ${mareas.bajamar.altura.toFixed(2)} m</span>`;
+                } else {
+                    document.getElementById('bajamarLinea').innerHTML = '🌑 --:-- <span class="coef">▼ --</span>';
+                }
+                document.getElementById('estadoMarea').innerHTML = mareas.estado;
+                statusDiv.innerHTML = '<i class="fas fa-info-circle"></i> Datos de marea calculados localmente (aproximación).';
+                statusDiv.className = 'weather-status status-moderado';
+            } else {
+                // Si todo bien, evaluar condiciones
+                const evaluacion = evaluarCondicionesBuceo(vientoVel, tempAgua, climaDesc);
+                statusDiv.innerHTML = evaluacion.mensaje;
+                statusDiv.className = `weather-status status-${evaluacion.estado}`;
+            }
+        } catch (err) {
+            console.error(err);
+            // Fallback completo: mostrar mareas calculadas localmente aunque falle todo
+            const ahora = new Date();
+            const mareas = calcularMareasLocal(ahora);
+            document.getElementById('pleamarLinea').innerHTML = `🌕 ${mareas.pleamar ? mareas.pleamar.hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'} <span class="coef">▲ ${mareas.pleamar ? mareas.pleamar.altura.toFixed(2) : '--'}</span>`;
+            document.getElementById('bajamarLinea').innerHTML = `🌑 ${mareas.bajamar ? mareas.bajamar.hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'} <span class="coef">▼ ${mareas.bajamar ? mareas.bajamar.altura.toFixed(2) : '--'}</span>`;
+            document.getElementById('estadoMarea').innerHTML = mareas.estado;
+            statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error al obtener clima. Mostrando mareas aproximadas.';
+            statusDiv.className = 'weather-status status-desfavorable';
+        }
+    }
+
+    // Funciones auxiliares (clima, viento, etc.)
+    function obtenerDireccionViento(grados) { const dir = ['N','NE','E','SE','S','SO','O','NO']; return dir[Math.round(grados/45)%8] || ''; }
+    function calcularTempAgua(tempAire, mes) { let t = tempAire-2; if(mes>=5 && mes<=9) t=Math.min(t+3,26); else if(mes>=11 || mes<=2) t=Math.max(t-2,12); return Math.round(t); }
+    function getIconoClima(code) { const map = {'01d':'sun','01n':'moon','02d':'cloud-sun','02n':'cloud-moon','03d':'cloud','03n':'cloud','04d':'cloud','04n':'cloud','09d':'cloud-rain','09n':'cloud-rain','10d':'cloud-sun-rain','10n':'cloud-moon-rain','11d':'bolt','11n':'bolt','13d':'snowflake','13n':'snowflake','50d':'smog','50n':'smog'}; return map[code]||'cloud'; }
+    function evaluarCondicionesBuceo(viento, tempAgua, clima) { let puntos=0, mensajes=[]; if(viento<10){puntos+=2; mensajes.push("🌊 Mar en calma");} else if(viento<20){puntos+=1; mensajes.push("🌊 Marejadilla");} else{puntos-=1; mensajes.push("🌊 Marejada");} if(tempAgua>=20){puntos+=2; mensajes.push("🌡️ Agua templada");} else if(tempAgua>=15){puntos+=1; mensajes.push("🌡️ Agua fresca");} else{puntos-=1; mensajes.push("🌡️ Agua fría");} const cl=clima.toLowerCase(); if(cl.includes("soleado")||cl.includes("despejado")){puntos+=1; mensajes.push("☀️ Buen clima");} else if(cl.includes("lluvia")||cl.includes("tormenta")){puntos-=2; mensajes.push("⚠️ Lluvia");} else if(cl.includes("nublado")) mensajes.push("☁️ Nublado"); let estado,msg; if(puntos>=3){estado="favorable"; msg="✅ FAVORABLE. "+mensajes.join(" · ");} else if(puntos>=0){estado="moderado"; msg="⚠️ MODERADO. Precaución. "+mensajes.join(" · ");} else{estado="desfavorable"; msg="❌ DESFAVORABLE. "+mensajes.join(" · ");} return {estado, mensaje:msg}; }
+    function usarMiUbicacion() { if(!navigator.geolocation) return alert("Geolocalización no soportada"); navigator.geolocation.getCurrentPosition(async (pos)=>{ try{ const resp=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=metric&lang=es&appid=${API_KEY}`); const data=await resp.json(); document.getElementById('ciudadInput').value=data.name; buscarClimaYMarea(); } catch(e){ alert("Error al obtener ubicación"); } }, ()=>alert("Permiso denegado")); }
+
+    // ========== GESTIÓN DE USUARIOS ==========
+    const CODIGO_ADMIN = "JOSEANGEL1999";
+    let usuarios = [];
+    let usuarioActual = null;
+    let esAdmin = false;
+    function togglePasswordVisibility() { const inp=document.getElementById('inputCodigo'), icon=document.getElementById('toggleIcon'); if(inp.type==='password'){ inp.type='text'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); } else{ inp.type='password'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } }
+    function cargarUsuarios() { const guardados=localStorage.getItem('mundomarino_usuarios'); if(guardados) usuarios=JSON.parse(guardados); else usuarios=[{codigo:"JOSEANGEL1999",nombre:"Administrador",activo:true,esAdmin:true},{codigo:"DEMO-001",nombre:"Usuario de prueba",activo:true,esAdmin:false},{codigo:"NEREA1999",nombre:"Nerea",activo:true,esAdmin:false}]; guardarUsuarios(); }
+    function guardarUsuarios() { localStorage.setItem('mundomarino_usuarios',JSON.stringify(usuarios)); }
+    function validarUsuario(cod) { const u=usuarios.find(u=>u.codigo===cod && u.activo); if(u){ usuarioActual=u; esAdmin=u.codigo===CODIGO_ADMIN||u.esAdmin===true; return true; } return false; }
+    function agregarUsuario() { const cod=document.getElementById('nuevoCodigo').value.trim().toUpperCase(); const nom=document.getElementById('nombreUsuario').value.trim(); if(!cod) return alert("Introduce código"); if(usuarios.find(u=>u.codigo===cod)) return alert("Ya existe"); usuarios.push({codigo:cod, nombre:nom||"Sin nombre", activo:true, esAdmin:false}); guardarUsuarios(); actualizarListaUsuarios(); document.getElementById('nuevoCodigo').value=''; document.getElementById('nombreUsuario').value=''; alert(`✅ Usuario añadido: ${cod}`); }
+    function eliminarUsuario(cod) { if(cod===CODIGO_ADMIN) return alert("No se puede eliminar admin"); if(confirm(`¿Eliminar ${cod}?`)){ usuarios=usuarios.filter(u=>u.codigo!==cod); guardarUsuarios(); actualizarListaUsuarios(); } }
+    function toggleActivarUsuario(cod) { if(cod===CODIGO_ADMIN) return alert("No se puede desactivar admin"); const idx=usuarios.findIndex(u=>u.codigo===cod); if(idx!==-1){ usuarios[idx].activo=!usuarios[idx].activo; guardarUsuarios(); actualizarListaUsuarios(); } }
+    function actualizarListaUsuarios() { const div=document.getElementById('listaCodigos'); if(!div) return; if(usuarios.length===0) div.innerHTML='<div style="text-align:center">No hay usuarios</div>'; else div.innerHTML=usuarios.map(u=>`<div class="codigo-item"><div><span>${u.codigo}</span> <small>(${u.nombre})</small>${!u.activo?' <small style="color:#dc3545">[INACTIVO]</small>':''}${u.esAdmin?' <small style="color:#ffc107">👑 ADMIN</small>':''}</div><div>${!u.esAdmin?`<button class="admin-btn" style="background:none; padding:4px 8px;" onclick="toggleActivarUsuario('${u.codigo}')">${u.activo?'<i class="fas fa-pause"></i>':'<i class="fas fa-play"></i>'}</button><button class="admin-btn" style="background:#dc3545; padding:4px 8px;" onclick="eliminarUsuario('${u.codigo}')"><i class="fas fa-trash"></i></button>`:'<span style="color:#ffc107"><i class="fas fa-crown"></i> Admin</span>'}</div></div>`).join(''); }
+    function iniciarSesion() { const cod=document.getElementById('inputCodigo').value.trim().toUpperCase(); if(validarUsuario(cod)){ localStorage.setItem('mundomarino_sesion',cod); verificarAcceso(); document.getElementById('inputCodigo').value=''; document.getElementById('loginError').style.display='none'; } else document.getElementById('loginError').style.display='block'; }
+    function cerrarSesion() { localStorage.removeItem('mundomarino_sesion'); usuarioActual=null; esAdmin=false; verificarAcceso(); }
+    function verificarAcceso() { const sesion=localStorage.getItem('mundomarino_sesion'); if(sesion && validarUsuario(sesion)){ document.getElementById('contenidoProtegido').style.display='block'; document.getElementById('panelLogin').style.display='none'; document.getElementById('logoutBtn').style.display='flex'; const adminPanel=document.getElementById('adminPanel'); if(adminPanel){ adminPanel.style.display=esAdmin?'block':'none'; if(esAdmin) actualizarListaUsuarios(); } if(usuarioActual && usuarioActual.nombre && usuarioActual.nombre!=="Sin nombre"){ let w=document.getElementById('welcomeMsg'); if(!w){ w=document.createElement('div'); w.id='welcomeMsg'; w.style.cssText='text-align:center; margin-bottom:8px; font-size:0.7rem; color:#8ba0b0;'; document.querySelector('.header').appendChild(w); } w.innerHTML=`<i class="fas fa-user-check"></i> Bienvenido, ${usuarioActual.nombre}`; } generarCampos(); } else{ document.getElementById('contenidoProtegido').style.display='none'; document.getElementById('panelLogin').style.display='flex'; document.getElementById('logoutBtn').style.display='none'; } }
+
+    // ========== CONFIGURACIÓN DE INMERSIÓN (igual que original) ==========
+    let estado = { inmersiones: 1, gas: 'aire', conCompresor: false };
+    let velDescenso = 18, velAscenso = 9;
+    let botellaCapacidad = 12, botellaPresion = 200;
+    let chart = null;
+    let animationFrame = null;
+    let lastTimestamp = 0;
+    let bubbles = [];
+    const BUBBLE_COUNT = 25;
+    let fishPhase = 0;
+    const fishPositions = [{ x: 8, y: 15, size: 12 },{ x: 12, y: 22, size: 10 },{ x: 16, y: 28, size: 14 },{ x: 20, y: 10, size: 9 },{ x: 55, y: 12, size: 11 },{ x: 62, y: 16, size: 13 }];
+    const extraFishPositions = [{ x: 32, y: 18, size: 11 },{ x: 45, y: 24, size: 12 }];
+    window.paradaInfo = null;
+
+    function setInmersiones(val) { estado.inmersiones = val; actualizarSelectores(); generarCampos(); if (document.getElementById('prof')?.value && document.getElementById('t1')?.value) calcularTodo();}
+    function setGas(val) { 
+        estado.gas = val; 
+        actualizarSelectores(); 
+        generarCampos(); 
+        if (val === 'nitrox') {
+            const fo2Input = document.getElementById('fo2_1');
+            if (fo2Input && !fo2Input.value) fo2Input.value = 32;
+        }
+        actualizarSugerenciaNDL();
+        actualizarTablaNitrox();
+        if (document.getElementById('prof')?.value && document.getElementById('t1')?.value) calcularTodo();
+    }
+    function setCompresor(val) { estado.conCompresor = val; actualizarSelectores(); generarCampos(); }
+    function actualizarSelectores() {
+        document.querySelectorAll('.selector-item:first-child .selector-btn').forEach((btn,i)=>{ if((estado.inmersiones===1 && i===0) || (estado.inmersiones===2 && i===1)) btn.classList.add('active'); else btn.classList.remove('active'); });
+        document.querySelectorAll('.selector-item:nth-child(2) .selector-btn').forEach(btn=>{ if((estado.gas==='aire' && btn.innerText.includes('Aire')) || (estado.gas==='nitrox' && btn.innerText.includes('Nitrox'))) btn.classList.add('active'); else btn.classList.remove('active'); });
+        document.querySelectorAll('.selector-item:nth-child(3) .selector-btn').forEach(btn=>{ if((estado.conCompresor && btn.innerText.includes('Cargar')) || (!estado.conCompresor && btn.innerText.includes('Sin'))) btn.classList.add('active'); else btn.classList.remove('active'); });
+    }
+    function setBotella(cap, pres) { botellaCapacidad=cap; botellaPresion=pres; document.getElementById('botellaInfo').innerHTML=`✅ Botella: ${cap}L @ ${pres}bar (${cap*pres} L)`; document.querySelectorAll('.botella-btn').forEach(btn=>btn.classList.remove('active')); document.querySelectorAll('.botella-btn').forEach(btn=>{ if(parseInt(btn.dataset.cap)===cap && parseInt(btn.dataset.pres)===pres) btn.classList.add('active'); }); const capPers=document.getElementById('capPersonalizada'); const presPers=document.getElementById('presPersonalizada'); if(capPers) capPers.value=cap; if(presPers) presPers.value=pres; actualizarAutonomia(); }
+    function setVelocidad(tipo) { if(tipo==='lento'){ velDescenso=12; velAscenso=6; document.getElementById("velocidadInfo").innerHTML="⬇12 ↑6 m/min (lento)"; } else if(tipo==='normal'){ velDescenso=18; velAscenso=9; document.getElementById("velocidadInfo").innerHTML="⬇18 ↑9 m/min (estándar PADI)"; } else{ velDescenso=24; velAscenso=12; document.getElementById("velocidadInfo").innerHTML="⬇24 ↑12 m/min (rápido)"; } document.querySelectorAll('.vel-btn').forEach((b,i)=>{ b.classList.remove('active'); if((tipo==='lento' && i===0)||(tipo==='normal' && i===1)||(tipo==='rapido' && i===2)) b.classList.add('active'); }); if(document.getElementById('prof')?.value && document.getElementById('t1')?.value) calcularTodo(); }
+    function actualizarAutonomia() { const prof=parseFloat(document.getElementById('prof')?.value); const sac=parseFloat(document.getElementById('sac')?.value); if(prof && sac) calcularAutonomia(prof,sac); }
+    function calcularAutonomia(p,sac) { const pAbs=1+p/10; const consumoMin=sac*pAbs; const litros=botellaCapacidad*botellaPresion; const total=litros/consumoMin; const conReserva=(litros-botellaCapacidad*50)/consumoMin; return {autonomiaMinutos:total, autonomiaConReserva:conReserva, consumoMinuto:consumoMin, litrosDisponibles:litros}; }
+    function actualizarRecomendacionNitrox(p) { const tabla=[{prof:12,ean:50,po2:1.10,tiempo:120},{prof:15,ean:45,po2:1.13,tiempo:120},{prof:18,ean:40,po2:1.12,tiempo:120},{prof:21,ean:36,po2:1.12,tiempo:120},{prof:24,ean:32,po2:1.09,tiempo:150},{prof:27,ean:30,po2:1.11,tiempo:120},{prof:30,ean:28,po2:1.12,tiempo:120}]; let rec=tabla.find(t=>p<=t.prof); if(!rec && p>30) rec={ean:26,po2:1.17,tiempo:90}; if(!rec && p<12) rec={ean:50,po2:(1+p/10)*0.5,tiempo:120}; if(rec) document.getElementById('recomendacionActual').innerHTML=`<i class="fas fa-star"></i> Para ${p}m, recomendamos <strong>EAN${rec.ean}</strong> (pO₂=${rec.po2.toFixed(2)} atm, máx ${rec.tiempo} min)`; return rec; }
+    function calcPresionAbs(p) { return 1+p/10; }
+    function consumo(p,t,sac) { return sac*calcPresionAbs(p)*t; }
+    function calcEAD(p,fo2) { let pAbs=calcPresionAbs(p); let pEAD=((1-fo2/100)*pAbs)/0.79; return Math.round((pEAD-1)*10); }
+    function maxO2(p) { return Math.floor((1.4/calcPresionAbs(p))*100); }
+    function cns(pO2,min) { let max=pO2>=1.6?45: pO2>=1.5?90: pO2>=1.4?120: pO2>=1.3?150: pO2>=1.2?180: pO2>=1.1?210: pO2>=1.0?240:360; return (min/max)*100; }
+    function validarNumeros(...vals) { return vals.every(v=>!isNaN(v) && v!==null && v!=="" && v>0); }
+
+    function actualizarSugerenciaNDL() {
+        const profInput = document.getElementById('prof');
+        if (!profInput) return;
+        const prof = parseFloat(profInput.value);
+        if (isNaN(prof) || prof <= 0) { if (document.getElementById('ndlSugerencia1')) document.getElementById('ndlSugerencia1').innerHTML = ''; return; }
+        let fo2 = 21;
+        if (estado.gas === 'nitrox') { 
+            const fo2Input = document.getElementById('fo2_1'); 
+            if (fo2Input) {
+                let val = parseFloat(fo2Input.value);
+                fo2 = (isNaN(val) || val < 21) ? 32 : Math.min(val, 50);
+            }
+        }
+        const ndl = getNDL(prof, fo2);
+        const tiempoActual = parseFloat(document.getElementById('t1')?.value);
+        let aviso = '', ndlText = '';
+        if (ndl === null) { ndlText = '⚠️ Profundidad excede límite recreativo'; if (tiempoActual && !isNaN(tiempoActual) && tiempoActual > 0) aviso = `<span class="ndl-aviso"><i class="fas fa-exclamation-triangle"></i> Buceo técnico necesario</span>`;
+        } else { 
+            ndlText = `Máx. sin descompresión: ${ndl} min (tabla ${tablaActual})`; 
+            if (tiempoActual && !isNaN(tiempoActual) && tiempoActual > ndl) aviso = `<span class="ndl-aviso"><i class="fas fa-exclamation-triangle"></i> Excede NDL - Requiere parada</span>`;
+        }
+        const sugerenciaDiv = document.getElementById('ndlSugerencia1');
+        if (sugerenciaDiv) sugerenciaDiv.innerHTML = `<i class="fas fa-clock"></i> ${ndlText} ${aviso}`;
+        if (estado.inmersiones === 2) { 
+            const prof2 = parseFloat(document.getElementById('prof')?.value) || prof;
+            let fo2_2 = 21;
+            if (estado.gas === 'nitrox') {
+                const fo2Input2 = document.getElementById('fo2_2');
+                if (fo2Input2) {
+                    let val2 = parseFloat(fo2Input2.value);
+                    fo2_2 = (isNaN(val2) || val2 < 21) ? 32 : Math.min(val2, 50);
+                }
+            }
+            const ndl2 = getNDL(prof2, fo2_2);
+            const t2 = parseFloat(document.getElementById('t2')?.value);
+            let aviso2 = '', ndlText2 = '';
+            if (ndl2 === null) { ndlText2 = '⚠️ Profundidad excede límite recreativo'; if (t2 && !isNaN(t2) && t2 > 0) aviso2 = `<span class="ndl-aviso"><i class="fas fa-exclamation-triangle"></i> Buceo técnico</span>`;
+            } else { ndlText2 = `Máx. sin descompresión: ${ndl2} min (${tablaActual})`; if (t2 && !isNaN(t2) && t2 > ndl2) aviso2 = `<span class="ndl-aviso"><i class="fas fa-exclamation-triangle"></i> Excede NDL - Requiere parada</span>`; }
+            const sugerenciaDiv2 = document.getElementById('ndlSugerencia2');
+            if (sugerenciaDiv2) sugerenciaDiv2.innerHTML = `<i class="fas fa-clock"></i> ${ndlText2} ${aviso2}`;
+        }
+    }
+
+    function generarCampos() {
+        const container=document.getElementById('camposDinamicos');
+        let html=`<div class="seccion-campos"><div class="seccion-titulo"><i class="fas fa-diving-mask"></i> Datos de inmersión</div><div class="grid-inputs">`;
+        html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-arrow-down"></i></div><input type="number" id="prof" class="input-field" placeholder="Profundidad (m)" oninput="actualizarRecomendacionNitrox(parseFloat(this.value)); actualizarAutonomia(); actualizarSugerenciaNDL();"></div>`;
+        html+=`<div class="ndl-sugerencia" id="ndlSugerencia1"></div>`;
+        html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-hourglass-half"></i></div><input type="number" id="t1" class="input-field" placeholder="Tiempo fondo 1ª (min)" oninput="actualizarSugerenciaNDL();"></div>`;
+        if(estado.inmersiones===2) {
+            html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-hourglass-end"></i></div><input type="number" id="t2" class="input-field" placeholder="Tiempo fondo 2ª (min)" oninput="actualizarSugerenciaNDL();"></div>`;
+            html+=`<div class="ndl-sugerencia" id="ndlSugerencia2"></div>`;
+            html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-clock"></i></div><input type="number" id="intervalo" class="input-field" placeholder="Intervalo superficie (min)"></div>`;
+        }
+        html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-lungs"></i></div><input type="number" id="sac" class="input-field" placeholder="SAC (l/min/atm)" oninput="actualizarAutonomia()"></div>`;
+        html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-cylinder"></i></div><input type="number" id="capPersonalizada" class="input-field" placeholder="O capacidad botella (L)" oninput="setBotellaPersonalizada()"></div>`;
+        html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-gauge-high"></i></div><input type="number" id="presPersonalizada" class="input-field" placeholder="O presión carga (bar)" oninput="setBotellaPersonalizada()"></div>`;
+        html+=`</div></div>`;
+        if(estado.gas==='nitrox') {
+            html+=`<div class="seccion-campos"><div class="seccion-titulo"><i class="fas fa-flask"></i> Mezcla Nitrox</div><div class="grid-inputs">`;
+            html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-percent"></i></div><input type="number" id="fo2_1" class="input-field" placeholder="%O₂ 1ª inmersión (21-50)" value="32" oninput="actualizarSugerenciaNDL(); actualizarRecomendacionNitrox(parseFloat(document.getElementById('prof')?.value));"></div>`;
+            if(estado.inmersiones===2) html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-percent"></i></div><input type="number" id="fo2_2" class="input-field" placeholder="%O₂ 2ª inmersión (21-50)" value="32" oninput="actualizarSugerenciaNDL();"></div>`;
+            html+=`</div></div>`;
+        }
+        if(estado.conCompresor) {
+            html+=`<div class="seccion-campos"><div class="seccion-titulo"><i class="fas fa-industry"></i> Carga de botellas</div><div class="grid-inputs">`;
+            html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-fan"></i></div><input type="number" id="flujoAire" class="input-field" placeholder="Flujo AIRE (l/min)"></div>`;
+            html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-fan"></i></div><input type="number" id="flujoNitrox" class="input-field" placeholder="Flujo NITROX (l/min)"></div>`;
+            html+=`<div class="input-group"><div class="input-icon"><i class="fas fa-users"></i></div><input type="number" id="numBotellas" class="input-field" placeholder="Nº de botellas"></div>`;
+            html+=`</div></div>`;
+        }
+        container.innerHTML=html;
+        document.getElementById('capPersonalizada').value=botellaCapacidad;
+        document.getElementById('presPersonalizada').value=botellaPresion;
+        setTimeout(() => actualizarSugerenciaNDL(), 100);
+    }
+    function setBotellaPersonalizada() { const cap=parseFloat(document.getElementById('capPersonalizada')?.value); const pres=parseFloat(document.getElementById('presPersonalizada')?.value); if(cap>0 && pres>0){ botellaCapacidad=cap; botellaPresion=pres; document.getElementById('botellaInfo').innerHTML=`🔧 Botella personalizada: ${cap}L @ ${pres}bar`; document.querySelectorAll('.botella-btn').forEach(btn=>btn.classList.remove('active')); actualizarAutonomia(); } }
+
+    function generarPuntosPerfil(profundidad, tiempoFondo, tiempoInicio = 0, parada = null) {
+        const tDesc = profundidad / velDescenso;
+        const tFinFondo = tDesc + tiempoFondo;
+        let puntos = [
+            { x: tiempoInicio, y: 0 },
+            { x: tiempoInicio + tDesc, y: profundidad },
+            { x: tiempoInicio + tFinFondo, y: profundidad }
+        ];
+        if (parada && parada.tiempo > 0) {
+            const tAscensoHasta5 = (profundidad - parada.profundidad) / velAscenso;
+            const tInicioParada = tiempoInicio + tFinFondo + tAscensoHasta5;
+            puntos.push({ x: tInicioParada, y: parada.profundidad });
+            puntos.push({ x: tInicioParada + parada.tiempo, y: parada.profundidad });
+            const tFinal = tInicioParada + parada.tiempo + (parada.profundidad / velAscenso);
+            puntos.push({ x: tFinal, y: 0 });
+            return { puntos, tDesc, tFinFondo, profundidad, tiempoFondo, paradaInicio: tInicioParada, paradaTiempo: parada.tiempo };
+        } else {
+            const tAscenso = profundidad / velAscenso;
+            const tFin = tiempoInicio + tFinFondo + tAscenso;
+            puntos.push({ x: tFin, y: 0 });
+            return { puntos, tDesc, tFinFondo, profundidad, tiempoFondo, paradaInicio: null, paradaTiempo: 0 };
+        }
+    }
+
+    // ========== PLUGIN MARINO (sin cambios) ==========
+    function drawShell(ctx, x, y, size) {
+        ctx.save();
+        ctx.shadowBlur = 3;
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+        ctx.fillStyle = '#f5e6d3';
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.quadraticCurveTo(x + size*0.5, y - size*0.3, x + size, y);
+        ctx.quadraticCurveTo(x + size*0.5, y + size*0.3, x, y);
+        ctx.fill();
+        ctx.fillStyle = '#b87c4f';
+        ctx.beginPath();
+        ctx.moveTo(x + size*0.2, y - size*0.05);
+        ctx.lineTo(x + size*0.8, y - size*0.05);
+        ctx.lineTo(x + size*0.5, y + size*0.15);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x + size*0.3, y + size*0.05);
+        ctx.lineTo(x + size*0.7, y + size*0.05);
+        ctx.lineTo(x + size*0.5, y + size*0.2);
+        ctx.fill();
+        ctx.strokeStyle = '#8b5a2b';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.quadraticCurveTo(x + size*0.5, y - size*0.3, x + size, y);
+        ctx.quadraticCurveTo(x + size*0.5, y + size*0.3, x, y);
+        ctx.stroke();
+        ctx.restore();
+    }
+    function drawStarfish(ctx, x, y, size) {
+        ctx.save();
+        ctx.shadowBlur = 3;
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+        ctx.fillStyle = '#e67e22';
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            let angle = i * 72 * Math.PI / 180 - Math.PI/2;
+            let x1 = x + Math.cos(angle) * size;
+            let y1 = y + Math.sin(angle) * size;
+            let x2 = x + Math.cos(angle + 36 * Math.PI/180) * size * 0.4;
+            let y2 = y + Math.sin(angle + 36 * Math.PI/180) * size * 0.4;
+            if (i === 0) ctx.moveTo(x1, y1);
+            else ctx.lineTo(x1, y1);
+            ctx.lineTo(x2, y2);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#d35400';
+        ctx.beginPath();
+        ctx.arc(x, y, size*0.2, 0, 2*Math.PI);
+        ctx.fill();
+        ctx.fillStyle = '#f1c40f';
+        for (let i = 0; i < 5; i++) {
+            let angle = i * 72 * Math.PI / 180 - Math.PI/2;
+            let x1 = x + Math.cos(angle) * size * 0.7;
+            let y1 = y + Math.sin(angle) * size * 0.7;
+            ctx.beginPath();
+            ctx.arc(x1, y1, size*0.1, 0, 2*Math.PI);
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+    const marinePlugin = {
+        id: 'marineLife',
+        afterDraw(chart) {
+            const { ctx, chartArea, scales } = chart;
+            if (!chartArea) return;
+            let allDepths = [];
+            if (chart.data.datasets[0]) allDepths = allDepths.concat(chart.data.datasets[0].data.map(p => p.y));
+            if (chart.data.datasets[1]) allDepths = allDepths.concat(chart.data.datasets[1].data.map(p => p.y));
+            const maxDepth = Math.max(...allDepths, 5);
+            const sandStartDepth = maxDepth - 0.5;
+            const sandStartY = scales.y.getPixelForValue(sandStartDepth);
+            const bottomY = chartArea.bottom;
+            if (sandStartY < bottomY) {
+                const sandGrad = ctx.createLinearGradient(0, sandStartY, 0, bottomY);
+                sandGrad.addColorStop(0, '#c2a575');
+                sandGrad.addColorStop(1, '#8b5a2b');
+                ctx.fillStyle = sandGrad;
+                ctx.fillRect(chartArea.left, sandStartY, chartArea.right - chartArea.left, bottomY - sandStartY);
+                ctx.fillStyle = '#e8c48a';
+                for (let i = 0; i < 300; i++) {
+                    const x = chartArea.left + Math.random() * (chartArea.right - chartArea.left);
+                    const y = sandStartY + Math.random() * (bottomY - sandStartY);
+                    ctx.beginPath();
+                    ctx.arc(x, y, Math.random() * 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                const sandWidth = chartArea.right - chartArea.left;
+                const sandHeight = bottomY - sandStartY;
+                drawShell(ctx, chartArea.left + sandWidth * 0.2, sandStartY + sandHeight * 0.6, 14);
+                drawShell(ctx, chartArea.left + sandWidth * 0.5, sandStartY + sandHeight * 0.3, 16);
+                drawShell(ctx, chartArea.left + sandWidth * 0.7, sandStartY + sandHeight * 0.8, 12);
+                drawShell(ctx, chartArea.left + sandWidth * 0.85, sandStartY + sandHeight * 0.4, 15);
+                drawStarfish(ctx, chartArea.left + sandWidth * 0.35, sandStartY + sandHeight * 0.7, 10);
+                drawStarfish(ctx, chartArea.left + sandWidth * 0.6, sandStartY + sandHeight * 0.5, 11);
+                drawStarfish(ctx, chartArea.left + sandWidth * 0.9, sandStartY + sandHeight * 0.2, 9);
+            }
+            // Algas
+            const algaePositions = [0.2, 0.35, 0.5, 0.65, 0.8];
+            const bottomYAlgae = chartArea.bottom;
+            function drawAlgae(x, baseY, height, width) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(x, baseY);
+                ctx.quadraticCurveTo(x - width*0.5, baseY - height*0.6, x, baseY - height);
+                ctx.quadraticCurveTo(x + width*0.5, baseY - height*0.3, x, baseY);
+                ctx.fillStyle = '#2e7d32';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(x + 4, baseY);
+                ctx.quadraticCurveTo(x + 4 + width*0.4, baseY - height*0.5, x + 4, baseY - height*0.8);
+                ctx.quadraticCurveTo(x + 4 - width*0.3, baseY - height*0.2, x + 4, baseY);
+                ctx.fillStyle = '#43a047';
+                ctx.fill();
+                ctx.restore();
+            }
+            algaePositions.forEach(ratio => { const algaeX = chartArea.left + ratio * (chartArea.right - chartArea.left); drawAlgae(algaeX, bottomYAlgae - 5, 25, 12); });
+            drawAlgae(chartArea.left + 0.3 * (chartArea.right - chartArea.left), bottomYAlgae - 5, 30, 15);
+            drawAlgae(chartArea.left + 0.7 * (chartArea.right - chartArea.left), bottomYAlgae - 5, 22, 10);
+            // Burbujas
+            ctx.save();
+            bubbles.forEach(bubble => {
+                const xPixel = scales.x.getPixelForValue(bubble.x);
+                const yPixel = scales.y.getPixelForValue(bubble.y);
+                if (xPixel >= chartArea.left - 30 && xPixel <= chartArea.right + 30 && yPixel >= chartArea.top - 30 && yPixel <= chartArea.bottom + 30) {
+                    const opacity = 0.5 + Math.sin(Date.now() * 0.008 + bubble.phase) * 0.3;
+                    ctx.beginPath();
+                    ctx.arc(xPixel, yPixel, bubble.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                    ctx.fill();
+                    ctx.strokeStyle = `rgba(200, 230, 255, ${opacity * 0.9})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(xPixel - bubble.size*0.2, yPixel - bubble.size*0.2, bubble.size*0.3, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${opacity + 0.2})`;
+                    ctx.fill();
+                }
+            });
+            ctx.restore();
+            // Peces
+            ctx.save();
+            for (let idx = 0; idx < fishPositions.length; idx++) {
+                const fish = fishPositions[idx];
+                const xPixel = scales.x.getPixelForValue(fish.x);
+                const yPixel = scales.y.getPixelForValue(fish.y);
+                if (xPixel >= chartArea.left - 80 && xPixel <= chartArea.right + 80 && yPixel >= chartArea.top - 80 && yPixel <= chartArea.bottom + 80) {
+                    const swim = Math.sin(fishPhase + fish.x * 0.5) * 3;
+                    const offsetY = Math.cos(fishPhase + fish.y * 0.3) * 2;
+                    const finalX = xPixel + swim, finalY = yPixel + offsetY;
+                    const fontSize = fish.size * 1.2;
+                    ctx.font = `${fontSize}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
+                    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                    ctx.fillStyle = `rgba(255, 255, 255, 0.9)`;
+                    ctx.fillText("🐠", finalX, finalY);
+                }
+            }
+            ctx.restore();
+            ctx.save();
+            for (let idx = 0; idx < extraFishPositions.length; idx++) {
+                const fish = extraFishPositions[idx];
+                const xPixel = scales.x.getPixelForValue(fish.x);
+                const yPixel = scales.y.getPixelForValue(fish.y);
+                if (xPixel >= chartArea.left - 80 && xPixel <= chartArea.right + 80 && yPixel >= chartArea.top - 80 && yPixel <= chartArea.bottom + 80) {
+                    const swim = Math.sin(fishPhase * 0.9 + fish.x * 0.4) * 3;
+                    const offsetY = Math.cos(fishPhase * 0.8 + fish.y * 0.2) * 2;
+                    const finalX = xPixel + swim, finalY = yPixel + offsetY;
+                    const fontSize = fish.size * 1.2;
+                    ctx.font = `${fontSize}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
+                    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                    ctx.fillStyle = `rgba(255, 255, 255, 0.9)`;
+                    ctx.fillText("🐟", finalX, finalY);
+                }
+            }
+            ctx.restore();
+            // Tortuga
+            const turtleX = scales.x.getPixelForValue(12);
+            const turtleY = scales.y.getPixelForValue(20);
+            if (turtleX >= chartArea.left - 50 && turtleX <= chartArea.right + 50 && turtleY >= chartArea.top - 50 && turtleY <= chartArea.bottom + 50) {
+                ctx.save();
+                ctx.translate(turtleX, turtleY);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 14*0.8, 14*0.6, 0, 0, Math.PI*2);
+                ctx.fillStyle = '#6b8e3c'; ctx.fill();
+                ctx.strokeStyle = '#3c5e2b'; ctx.lineWidth = 1.5; ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(0, 0, 14*0.5, 14*0.4, 0, 0, Math.PI*2);
+                ctx.fillStyle = '#8bc34a'; ctx.fill();
+                ctx.beginPath(); ctx.ellipse(14*0.9, -14*0.2, 14*0.4, 14*0.3, 0, 0, Math.PI*2);
+                ctx.fillStyle = '#7cb342'; ctx.fill();
+                ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(14*1.05, -14*0.25, 14*0.08, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(14*0.5, -14*0.3); ctx.lineTo(14*0.9, -14*0.7); ctx.lineTo(14*0.7, -14*0.4); ctx.fillStyle = '#6b8e3c'; ctx.fill();
+                ctx.beginPath(); ctx.moveTo(14*0.5, 14*0.2); ctx.lineTo(14*0.9, 14*0.6); ctx.lineTo(14*0.7, 14*0.3); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(-14*0.6, -14*0.2); ctx.lineTo(-14*1.0, -14*0.5); ctx.lineTo(-14*0.7, -14*0.1); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(-14*0.6, 14*0.2); ctx.lineTo(-14*1.0, 14*0.5); ctx.lineTo(-14*0.7, 14*0.1); ctx.fill();
+                ctx.restore();
+            }
+            // Barco
+            const boatX = scales.x.getPixelForValue(35);
+            const boatY = scales.y.getPixelForValue(0);
+            if (boatX >= chartArea.left - 80 && boatX <= chartArea.right + 80) {
+                ctx.save();
+                ctx.translate(boatX, boatY - 8);
+                ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(-13, -12); ctx.lineTo(13, -12); ctx.lineTo(20, 0);
+                ctx.fillStyle = '#5d3a1a'; ctx.fill();
+                ctx.strokeStyle = '#3a2510'; ctx.lineWidth = 1.5; ctx.stroke();
+                ctx.fillStyle = '#a57c4a'; ctx.fillRect(-10, -12, 20, 4);
+                ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(0, -36); ctx.lineWidth = 2; ctx.strokeStyle = '#4a2a10'; ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, -36); ctx.lineTo(16, -20); ctx.lineTo(0, -16); ctx.fillStyle = '#f5e6d3'; ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#e63946'; ctx.fillRect(0, -36, 8, 3);
+                ctx.restore();
+            }
+            // Mostrar tiempo de parada
+            if (window.paradaInfo && window.paradaInfo.tiempo > 0 && window.paradaInfo.inicioX) {
+                const xParada = scales.x.getPixelForValue(window.paradaInfo.inicioX + window.paradaInfo.tiempo/2);
+                const yParada = scales.y.getPixelForValue(5);
+                ctx.font = "bold 14px 'Inter'";
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = "black";
+                ctx.fillStyle = "#ffff00";
+                ctx.fillText(`⏱️ PARADA ${window.paradaInfo.tiempo} min`, xParada - 45, yParada - 10);
+                ctx.fillStyle = "#ffffff";
+                ctx.fillText(`⏱️ PARADA ${window.paradaInfo.tiempo} min`, xParada - 46, yParada - 11);
+                ctx.shadowBlur = 0;
+            }
+        }
+    };
+
+    function initBubbles(minX, maxX, minY, maxY) {
+        bubbles = [];
+        for (let i=0;i<BUBBLE_COUNT;i++) {
+            bubbles.push({
+                x: minX + Math.random() * (maxX - minX),
+                y: minY + Math.random() * (maxY - minY),
+                size: 2+Math.random()*7,
+                speed: 0.4+Math.random()*1.8,
+                phase: Math.random()*Math.PI*2,
+                wobble: Math.random()*Math.PI*2
+            });
+        }
+    }
+    function updateBubbles(minX, maxX, minY, maxY, deltaTime=0.1) {
+        for(let b of bubbles){
+            b.y-=b.speed*deltaTime;
+            b.x+=Math.sin(Date.now()*0.003+b.wobble)*0.03;
+            if(b.y<minY){ b.y=maxY; b.x=minX+Math.random()*(maxX-minX); }
+            if(b.x<minX) b.x=minX;
+            if(b.x>maxX) b.x=maxX;
+        }
+    }
+
+    function renderChart(dive1Points, dive2Points) {
+        const canvas = document.getElementById('diveChart'); if (!canvas) return; if (chart) chart.destroy();
+        let allX = []; dive1Points.forEach(p => allX.push(p.x)); if (dive2Points) dive2Points.forEach(p => allX.push(p.x));
+        const minX = Math.min(...allX, 0), maxX = Math.max(...allX, 0);
+        const maxDepth = Math.max(...dive1Points.map(p => p.y), ...(dive2Points ? dive2Points.map(p => p.y) : []), 5);
+        const datasets = [
+            { label: 'Inmersión 1', data: dive1Points, borderColor: '#00a8ff', backgroundColor: 'rgba(0, 168, 255, 0.15)', borderWidth: 3, fill: true, pointRadius: 4, pointBackgroundColor: '#ffd966', pointBorderColor: '#ffffff', tension: 0.2 }
+        ];
+        if (dive2Points && dive2Points.length > 0) datasets.push({ label: 'Inmersión 2', data: dive2Points, borderColor: '#2ecc71', backgroundColor: 'rgba(46, 204, 113, 0.15)', borderWidth: 3, fill: true, pointRadius: 4, pointBackgroundColor: '#ffd966', pointBorderColor: '#ffffff', tension: 0.2 });
+        datasets.push({ label: 'Superficie (0 m)', data: [{ x: minX, y: 0 }, { x: maxX, y: 0 }], borderColor: '#ffaa44', borderWidth: 2, borderDash: [8, 6], pointRadius: 0, fill: false, showLine: true });
+        chart = new Chart(canvas.getContext('2d'), { type: 'line', data: { datasets }, options: {
+            responsive: true, maintainAspectRatio: true,
+            scales: {
+                x: { type: 'linear', title: { display: true, text: '⏱️ Tiempo (minutos)', font: { size: 14, weight: 'bold' }, color: '#e8f0fe' }, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#e8f0fe', stepSize: 10 } },
+                y: { title: { display: true, text: '⬇️ Profundidad (metros)', font: { size: 14, weight: 'bold' }, color: '#e8f0fe' }, reverse: true, min: 0, max: maxDepth + 3, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { stepSize: 5, callback: (val) => val + ' m', color: '#e8f0fe' } }
+            },
+            plugins: {
+                tooltip: { backgroundColor: '#0f2c33', titleColor: '#ffd966', bodyColor: '#e8f0fe', callbacks: { label: (context) => { if (context.dataset.label === 'Superficie (0 m)') return null; return `🐟 Profundidad: ${context.raw.y} m`; } } },
+                legend: { labels: { font: { size: 12, weight: 'bold' }, color: '#e8f0fe', usePointStyle: true }, position: 'top' }
+            }
+        }, plugins: [marinePlugin] });
+        const scales = chart.scales; if (scales && scales.x && scales.y) initBubbles(scales.x.min, scales.x.max, scales.y.min, scales.y.max);
+    }
+
+    function animate(time) {
+        if (!chart) return;
+        const now=Date.now(); let delta=Math.min(0.1,(now-(lastTimestamp||now))/1000);
+        lastTimestamp=now; fishPhase+=0.1;
+        const scales=chart.scales; if(scales&&scales.x&&scales.y) updateBubbles(scales.x.min,scales.x.max,scales.y.min,scales.y.max,delta);
+        chart.update();
+        animationFrame=requestAnimationFrame(animate);
+    }
+
+    function mostrarInfoPerfil(datos1, datos2, intervalo) {
+        const container = document.getElementById('infoPerfil'); let html = '';
+        if (datos1) { html += `<div class="info-item"><i class="fas fa-arrow-down" style="color:#2ecc71;"></i> <strong>Inm. 1 - Descenso</strong> ${datos1.tDesc.toFixed(1)} min</div><div class="info-item"><i class="fas fa-water" style="color:#3498db;"></i> <strong>Inm. 1 - Fondo</strong> ${datos1.tiempoFondo} min</div><div class="info-item"><i class="fas fa-arrow-up" style="color:#e67e22;"></i> <strong>Inm. 1 - Ascenso</strong> ${((datos1.puntos[datos1.puntos.length-1].x - datos1.tFinFondo - datos1.tDesc).toFixed(1))} min</div><div class="info-item"><i class="fas fa-clock"></i> <strong>Inm. 1 - Total</strong> ${datos1.puntos[datos1.puntos.length-1].x.toFixed(1)} min</div><div class="info-item"><i class="fas fa-arrow-down"></i> <strong>Profundidad</strong> ${datos1.profundidad} m</div>`; }
+        if (datos2) { html += `<div class="info-item"><i class="fas fa-arrow-down" style="color:#2ecc71;"></i> <strong>Inm. 2 - Descenso</strong> ${datos2.tDesc.toFixed(1)} min</div><div class="info-item"><i class="fas fa-water" style="color:#3498db;"></i> <strong>Inm. 2 - Fondo</strong> ${datos2.tiempoFondo} min</div><div class="info-item"><i class="fas fa-arrow-up" style="color:#e67e22;"></i> <strong>Inm. 2 - Ascenso</strong> ${((datos2.puntos[datos2.puntos.length-1].x - datos2.tFinFondo - datos2.tDesc).toFixed(1))} min</div><div class="info-item"><i class="fas fa-clock"></i> <strong>Inm. 2 - Total</strong> ${datos2.puntos[datos2.puntos.length-1].x.toFixed(1)} min</div><div class="info-item"><i class="fas fa-arrow-down"></i> <strong>Profundidad</strong> ${datos2.profundidad} m</div>`; }
+        if (intervalo !== null && intervalo > 0) html += `<div class="info-item"><i class="fas fa-clock"></i> <strong>Intervalo en superficie</strong> ${intervalo} min</div>`;
+        container.innerHTML = html; document.getElementById('velInfoGrafico').innerHTML = `⬇ ${velDescenso} m/min | ⬆ ${velAscenso} m/min`;
+    }
+
+    function limpiarCampos() { document.querySelectorAll('#camposDinamicos input').forEach(i=>i.value=''); document.getElementById('resultsContainer').innerHTML=''; document.getElementById('alertContainer').innerHTML=''; document.getElementById('graficoContainer').style.display='none'; if(chart) { chart.destroy(); chart=null; } if(animationFrame) cancelAnimationFrame(animationFrame); }
+
+    async function calcularTodo() {
+        const prof1 = parseFloat(document.getElementById('prof')?.value);
+        let t1 = parseFloat(document.getElementById('t1')?.value);
+        const sac = parseFloat(document.getElementById('sac')?.value);
+        let fo2_1 = 21;
+        if (estado.gas === 'nitrox') {
+            let val = parseFloat(document.getElementById('fo2_1')?.value);
+            fo2_1 = (isNaN(val) || val < 21) ? 32 : Math.min(val, 50);
+        }
+        if (!validarNumeros(prof1, t1, sac)) {
+            document.getElementById('alertContainer').innerHTML = '<div class="alert"><i class="fas fa-exclamation-triangle"></i> Completa: Profundidad, tiempo 1ª y SAC.</div>';
+            return;
+        }
+        document.getElementById('alertContainer').innerHTML = '';
+        const ndl1 = getNDL(prof1, fo2_1);
+        const parada1 = ndl1 !== null && t1 > ndl1 ? calcularParada(t1, ndl1) : null;
+        const datos1 = generarPuntosPerfil(prof1, t1, 0, parada1);
+        window.paradaInfo = null;
+        if (parada1) {
+            window.paradaInfo = { tiempo: parada1.tiempo, profundidad: parada1.profundidad, inicioX: datos1.paradaInicio };
+        }
+        let dive1Points = datos1.puntos;
+        let dive2Points = null, datos2 = null, intervaloVal = null, consumo2 = null, parada2 = null;
+        if (estado.inmersiones === 2) {
+            const prof2 = parseFloat(document.getElementById('prof')?.value);
+            const t2 = parseFloat(document.getElementById('t2')?.value);
+            const intervalo = parseFloat(document.getElementById('intervalo')?.value);
+            if (validarNumeros(t2, intervalo)) {
+                intervaloVal = intervalo;
+                let fo2_2 = 21;
+                if (estado.gas === 'nitrox') {
+                    let val2 = parseFloat(document.getElementById('fo2_2')?.value);
+                    fo2_2 = (isNaN(val2) || val2 < 21) ? 32 : Math.min(val2, 50);
+                }
+                const ndl2 = getNDL(prof2, fo2_2);
+                parada2 = ndl2 !== null && t2 > ndl2 ? calcularParada(t2, ndl2) : null;
+                const inicioSegunda = datos1.puntos[datos1.puntos.length-1].x + intervalo;
+                datos2 = generarPuntosPerfil(prof2, t2, inicioSegunda, parada2);
+                dive2Points = datos2.puntos;
+                consumo2 = consumo(prof2, t2, sac);
+            }
+        }
+        renderChart(dive1Points, dive2Points);
+        mostrarInfoPerfil(datos1, datos2, intervaloVal);
+        document.getElementById('graficoContainer').style.display = 'block';
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        animate();
+
+        const pAbs = calcPresionAbs(prof1);
+        const consumo1 = consumo(prof1, t1, sac);
+        const ead1 = calcEAD(prof1, fo2_1);
+        const maxO2Val = maxO2(prof1);
+        const pO2_1 = (fo2_1/100) * pAbs;
+        const cns1 = cns(pO2_1, t1);
+        const { autonomiaMinutos, autonomiaConReserva, consumoMinuto, litrosDisponibles } = calcularAutonomia(prof1, sac);
+        let htmlResultados = `<div class="result-card autonomia-card"><div class="card-header"><i class="fas fa-hourglass"></i><h3>⏱️ AUTONOMÍA</h3></div>
+        <div class="card-value">📦 Botella: ${botellaCapacidad}L @ ${botellaPresion}bar (${litrosDisponibles} L)</div>
+        <div class="card-value">💨 Consumo real: ${consumoMinuto.toFixed(1)} L/min</div>
+        <div class="card-value">🔵 Autonomía total: ${autonomiaMinutos.toFixed(0)} min (${(autonomiaMinutos/60).toFixed(1)} h)</div>
+        <div class="card-value">🟢 Con reserva 50 bar: ${autonomiaConReserva.toFixed(0)} min</div>
+        <div class="card-value">⚠️ Tiempo de fondo planificado: ${t1} min → ${t1 <= autonomiaConReserva ? '✅ Suficiente' : '❌ Insuficiente'}</div></div>
+        <div class="result-card"><div class="card-header"><i class="fas fa-gas-pump"></i><h3>Consumo</h3></div><div class="card-value">${Math.round(consumo1)} L <span>1ª inmersión</span></div>`;
+        if (consumo2 !== null) htmlResultados += `<div class="card-value">${Math.round(consumo2)} L <span>2ª inmersión</span></div>`;
+        htmlResultados += `</div><div class="result-card"><div class="card-header"><i class="fas fa-clock"></i><h3>Tiempos de perfil</h3></div>
+        <div class="card-value"><span style="color:#2ecc71;">⬇ Descenso: ${datos1.tDesc.toFixed(1)} min</span> | <span style="color:#3498db;">🟦 Fondo: ${datos1.tiempoFondo} min</span> | <span style="color:#e67e22;">⬆ Ascenso: ${((datos1.puntos[datos1.puntos.length-1].x - datos1.tFinFondo - datos1.tDesc).toFixed(1))} min</span></div>
+        <div class="card-value">Total inmersión: ${datos1.puntos[datos1.puntos.length-1].x.toFixed(1)} min | Profundidad máx: ${datos1.profundidad} m</div></div>`;
+        if (parada1) htmlResultados += `<div class="result-card"><div class="card-header"><i class="fas fa-stopwatch"></i><h3>⚠️ DESCOMPRESIÓN OBLIGATORIA</h3></div><div class="card-value">Parada a ${parada1.profundidad} m durante ${parada1.tiempo} min</div><div class="card-value">Tiempo total de ascenso con parada: ${((datos1.puntos[datos1.puntos.length-1].x - datos1.tFinFondo - datos1.tDesc).toFixed(1))} min</div></div>`;
+        if (parada2) htmlResultados += `<div class="result-card"><div class="card-header"><i class="fas fa-stopwatch"></i><h3>⚠️ DESCOMPRESIÓN OBLIGATORIA (2ª inmersión)</h3></div><div class="card-value">Parada a ${parada2.profundidad} m durante ${parada2.tiempo} min</div></div>`;
+        if (estado.gas === 'nitrox') htmlResultados += `<div class="result-card"><div class="card-header"><i class="fas fa-chart-line"></i><h3>EAD / Nitrox</h3></div><div class="card-value">EAD: ${ead1} m <span>(EAN${fo2_1})</span></div><div class="card-value">Max O₂ permitido: ${maxO2Val}%</div><div class="card-value">CNS: ${cns1.toFixed(1)}%</div></div>`;
+        htmlResultados += `<div class="result-card"><div class="card-header"><i class="fas fa-chart-simple"></i><h3>Límites (${tablaActual})</h3></div><div class="card-value">NDL a ${prof1}m: ${ndl1 !== null ? ndl1 : 'No aplicable (buceo técnico)'} min</div></div>`;
+        document.getElementById('resultsContainer').innerHTML = htmlResultados;
+        const recomendacion = actualizarRecomendacionNitrox(prof1);
+        document.getElementById('explicacionesPanel').innerHTML = `<div class="step-title"><i class="fas fa-chart-line"></i> Resumen del cálculo</div>
+        <div class="step-calculation">Presión absoluta: ${pAbs.toFixed(2)} atm</div>
+        <div class="step-calculation">Consumo real: ${consumoMinuto.toFixed(1)} L/min</div>
+        <div class="step-calculation">Autonomía (con reserva): ${autonomiaConReserva.toFixed(0)} min</div>
+        <div class="step-calculation">Velocidades: ↓ ${velDescenso} m/min | ↑ ${velAscenso} m/min</div>
+        <div class="step-calculation">⬇ Descenso: ${datos1.tDesc.toFixed(1)} min | 🟦 Fondo: ${datos1.tiempoFondo} min | ⬆ Ascenso: ${((datos1.puntos[datos1.puntos.length-1].x - datos1.tFinFondo - datos1.tDesc).toFixed(1))} min</div>
+        ${estado.gas === 'nitrox' ? `<div class="step-calculation">EAD: ${ead1} m | CNS: ${cns1.toFixed(1)}%</div>` : ''}
+        ${parada1 ? `<div class="step-calculation"><i class="fas fa-exclamation-triangle"></i> Parada descompresiva: ${parada1.tiempo} min a ${parada1.profundidad} m</div>` : ''}
+        ${recomendacion ? `<div class="step-calculation"><i class="fas fa-flask"></i> Recomendación Nitrox: EAN${recomendacion.ean} para ${prof1}m</div>` : ''}`;
+    }
+
+    cargarUsuarios();
+    verificarAcceso();
+    setBotella(12, 200);
+    setVelocidad('normal');
+    setTabla('PADI');
+    setTimeout(() => { if(document.getElementById('ciudadInput').value) buscarClimaYMarea(); }, 1000);
+</script>
+</body>
+</html>
